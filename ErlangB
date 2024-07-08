@@ -1,84 +1,110 @@
-import math
-from openpyxl import Workbook
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Erlang B</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            width: 50%;
+            margin: 0 auto;
+            text-align: center;
+        }
+        input, button {
+            margin: 5px;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Calculadora Erlang B</h1>
+        <form id="erlangForm">
+            <div>
+                <label for="A">Valor de A:</label>
+                <input type="number" id="A" name="A" step="any">
+            </div>
+            <div>
+                <label for="N">Valor de N:</label>
+                <input type="number" id="N" name="N" step="any">
+            </div>
+            <div>
+                <label for="B">Valor de B:</label>
+                <input type="number" id="B" name="B" step="any">
+            </div>
+            <div>
+                <button type="button" onclick="calculateB()">Calcular B</button>
+                <button type="button" onclick="calculateN()">Calcular N</button>
+                <button type="button" onclick="calculateA()">Calcular A</button>
+            </div>
+        </form>
+        <div id="result"></div>
+    </div>
+    <script>
+        function erlangB(A, N) {
+            let numerator = Math.pow(A, N) / factorial(N);
+            let denominator = 0;
+            for (let k = 0; k <= N; k++) {
+                denominator += Math.pow(A, k) / factorial(k);
+            }
+            return numerator / denominator;
+        }
 
-def erlang_b(A, N):
-    numerator = (A**N) / math.factorial(N)
-    denominator = sum([(A**k) / math.factorial(k) for k in range(N + 1)])
-    return numerator / denominator
+        function factorial(n) {
+            if (n === 0) {
+                return 1;
+            }
+            return n * factorial(n - 1);
+        }
 
-def bissection_method(equation, target, lower_bound, upper_bound, max_iterations=1000, tolerance=1e-6):
-    for _ in range(max_iterations):
-        midpoint = (lower_bound + upper_bound) / 2
-        if abs(equation(midpoint) - target) < tolerance:
-            return midpoint
-        if equation(midpoint) < target:
-            lower_bound = midpoint
-        else:
-            upper_bound = midpoint
-    print("O método não convergiu após", max_iterations, "iterações.")
-    return None
+        function bissectionMethod(equation, target, lowerBound, upperBound, maxIterations = 1000, tolerance = 1e-6) {
+            for (let i = 0; i < maxIterations; i++) {
+                let midpoint = (lowerBound + upperBound) / 2;
+                if (Math.abs(equation(midpoint) - target) < tolerance) {
+                    return midpoint;
+                }
+                if (equation(midpoint) < target) {
+                    lowerBound = midpoint;
+                } else {
+                    upperBound = midpoint;
+                }
+            }
+            alert("O método não convergiu após " + maxIterations + " iterações.");
+            return null;
+        }
 
-def create_erlang_table(max_A, max_N):
-    wb = Workbook()
-    ws = wb.active
-    ws.title = "Erlang Table"
-    
-    # Escreve os cabeçalhos
-    ws['A1'] = "A \\ N"
-    for n in range(1, max_N + 1):
-        ws.cell(row=1, column=n + 1, value=f"N={n}")
-    
-    # Preenche a tabela
-    for a in range(1, max_A + 1):
-        ws.cell(row=a + 1, column=1, value=f"A={a}")
-        for n in range(1, max_N + 1):
-            B = erlang_b(a, n)
-            ws.cell(row=a + 1, column=n + 1, value=B)
-    
-    return wb
+        function calculateB() {
+            let A = parseFloat(document.getElementById('A').value);
+            let N = parseInt(document.getElementById('N').value);
+            let result = erlangB(A, N);
+            document.getElementById('result').innerText = 'O valor de B é: ' + result;
+        }
 
-def save_excel_file(workbook, filename):
-    workbook.save(filename)
-    print(f"Arquivo '{filename}' salvo com sucesso!")
+        function calculateN() {
+            let B = parseFloat(document.getElementById('B').value);
+            let A = parseFloat(document.getElementById('A').value);
+            let lowerBound = 1;
+            let upperBound = 1000;  // Valor arbitrário, pode ser ajustado conforme necessário
+            let N = bissectionMethod(x => erlangB(A, x), B, lowerBound, upperBound);
+            if (N !== null) {
+                document.getElementById('result').innerText = 'O valor de N é: ' + Math.round(N);
+            }
+        }
 
-# Exemplo de uso
-while True:
-    print("\nCalculadora de Erlang B")
-    print("1. Calcular N")
-    print("2. Calcular A")
-    print("3. Calcular B")
-    print("4. Gerar e exportar tabela Erlang")
-    print("5. Sair")
-    option = int(input("Escolha uma opção (1/2/3/4/5): "))
+        function calculateA() {
+            let B = parseFloat(document.getElementById('B').value);
+            let N = parseInt(document.getElementById('N').value);
+            let lowerBound = 0;
+            let upperBound = 1000;  // Valor arbitrário, pode ser ajustado conforme necessário
+            let A = bissectionMethod(x => erlangB(x, N), B, lowerBound, upperBound);
+            if (A !== null) {
+                document.getElementById('result').innerText = 'O valor de A é: ' + A;
+            }
+        }
+    </script>
+</body>
+</html>
 
-    if option == 1:
-        B = float(input("Digite o valor de B: "))
-        A = float(input("Digite o valor de A: "))
-        lower_bound = 1
-        upper_bound = 1000  # Valor arbitrário, pode ser ajustado conforme necessário
-        N = bissection_method(lambda x: erlang_b(A, x), B, lower_bound, upper_bound)
-        if N is not None:
-            print("O valor de N é:", int(N))
-    elif option == 2:
-        B = float(input("Digite o valor de B: "))
-        N = int(input("Digite o valor de N: "))
-        lower_bound = 0
-        upper_bound = 1000  # Valor arbitrário, pode ser ajustado conforme necessário
-        A = bissection_method(lambda x: erlang_b(x, N), B, lower_bound, upper_bound)
-        if A is not None:
-            print("O valor de A é:", A)
-    elif option == 3:
-        A = float(input("Digite o valor de A: "))
-        N = int(input("Digite o valor de N: "))
-        print("O valor de B é:", erlang_b(A, N))
-    elif option == 4:
-        max_A = int(input("Digite o valor máximo de A para a tabela: "))
-        max_N = int(input("Digite o valor máximo de N para a tabela: "))
-        filename = input("Digite o nome do arquivo de saída: ")
-        table = create_erlang_table(max_A, max_N)
-        save_excel_file(table, filename)
-    elif option == 5:
-        print("Encerrando o programa.")
-        break
-    else:
-        print("Opção inválida.")
